@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import { Button } from "~/components/ui/button";
+import { Textarea } from "~/components/ui/textarea";
 
 // Camera component
 const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
@@ -62,48 +64,37 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="relative aspect-square w-full overflow-hidden rounded-lg shadow-md">
+    <div className="flex flex-col items-center gap-4 md:gap-6">
+      <div className="relative aspect-square w-full overflow-hidden">
+        {/* Loading message */}
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-600">
+          Loading camera...
+        </div>
         {hasCamera ? (
           <video
             ref={videoRef}
             autoPlay
             playsInline
-            className="h-full w-full scale-x-[-1] transform object-cover"
+            className="relative h-full w-full scale-x-[-1] transform object-cover"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gray-200">
-            <svg
-              className="h-24 w-24 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
+          <div className="relative flex h-full w-full flex-col items-center justify-center bg-gray-200 p-4 text-center">
+            <h3 className="mb-2 text-xl font-bold text-red-600">
+              Camera Not Available
+            </h3>
+            <p className="text-gray-700">
+              This app requires access to your camera. Please ensure you&apos;ve
+              granted camera permissions and reload the page.
+            </p>
           </div>
         )}
       </div>
       <canvas ref={canvasRef} style={{ display: "none" }} />
-      <button
-        onClick={captureImage}
-        className="w-full rounded-lg bg-blue-600 px-6 py-3 font-bold text-white transition duration-300 hover:bg-blue-700 disabled:bg-blue-300"
-        disabled={!hasCamera}
-      >
-        Take Picture
-      </button>
+      <div className="mb-4 w-full px-4 md:mb-6 md:px-6">
+        <Button onClick={captureImage} className="w-full" disabled={!hasCamera}>
+          Take Picture
+        </Button>
+      </div>
     </div>
   );
 };
@@ -186,79 +177,93 @@ export default function MealAnalysisPage() {
 
   return (
     <main className="min-h-screen bg-white text-gray-800">
-      <div className="container mx-auto max-w-lg px-4 py-16">
-        <h1 className="mb-8 text-center text-3xl font-bold text-gray-900 sm:text-4xl">
+      <div className="container mx-auto max-w-lg space-y-8 px-4 pb-16 pt-8 md:pt-16">
+        <h1 className="text-center text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
           {step === "camera" && "Take a Picture"}
           {step === "details" && "Meal Details"}
           {step === "analysis" && "Meal Analysis"}
         </h1>
 
-        {step === "camera" && <Camera onCapture={handleCapture} />}
+        <div className="overflow-hidden rounded-2xl border border-gray-200 shadow-lg">
+          {step === "camera" && (
+            <div className="overflow-hidden rounded-t-2xl">
+              <Camera onCapture={handleCapture} />
+            </div>
+          )}
 
-        {(step === "details" || step === "analysis") && imageUrl && (
-          <div className="mb-8 flex w-full flex-col gap-4">
-            <div className="relative aspect-square w-full overflow-hidden rounded-lg shadow-md">
-              <Image
-                src={imageUrl}
-                alt="Captured meal"
-                fill
-                style={{ objectFit: "cover" }}
-              />
+          {(step === "details" || step === "analysis") && imageUrl && (
+            <div className="w-full">
+              <div className="relative aspect-square w-full overflow-hidden rounded-t-2xl">
+                <Image
+                  src={imageUrl}
+                  alt="Captured meal"
+                  fill
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
             </div>
-            {step === "details" && (
-              <button
-                type="button"
-                onClick={handleRetake}
-                className="rounded-lg bg-gray-200 px-6 py-3 font-bold text-gray-800 transition duration-300 hover:bg-gray-300"
-              >
-                Retake Picture
-              </button>
-            )}
-          </div>
-        )}
+          )}
 
-        {step === "details" && (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label
-                htmlFor="mealDescription"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Meal Description (Optional)
-              </label>
-              <textarea
-                id="mealDescription"
-                value={mealDescription}
-                onChange={(e) => setMealDescription(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                rows={3}
-              ></textarea>
+          {step != "camera" && (
+            <div className="space-y-6 p-4 md:p-6">
+              {step === "details" && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRetake}
+                    className="w-full"
+                  >
+                    Retake Picture
+                  </Button>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                      <label
+                        htmlFor="mealDescription"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Meal Description (Optional)
+                      </label>
+                      <Textarea
+                        id="mealDescription"
+                        value={mealDescription}
+                        onChange={(e) => setMealDescription(e.target.value)}
+                        className="mt-1"
+                        rows={3}
+                        placeholder="Describe your meal here..."
+                      />
+                    </div>
+                    <div>
+                      <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Analyzing..." : "Analyze Meal"}
+                      </Button>
+                    </div>
+                  </form>
+                </>
+              )}
+
+              {step === "analysis" && analysis && (
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <h2 className="text-2xl font-semibold text-gray-900">
+                      Nutrition Facts
+                    </h2>
+                    <p className="text-gray-700">{analysis}</p>
+                  </div>
+                </div>
+              )}
             </div>
-            <div>
-              <button
-                type="submit"
-                className="w-full rounded-lg bg-blue-600 px-6 py-3 font-bold text-white transition duration-300 hover:bg-blue-700 disabled:bg-blue-300"
-                disabled={isLoading}
-              >
-                {isLoading ? "Analyzing..." : "Analyze Meal"}
-              </button>
-            </div>
-          </form>
-        )}
+          )}
+        </div>
 
         {step === "analysis" && analysis && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-semibold text-gray-900">
-              Analysis Result:
-            </h2>
-            <p className="text-gray-700">{analysis}</p>
-            <button
-              onClick={resetForm}
-              className="w-full rounded-lg bg-blue-600 px-6 py-3 font-bold text-white transition duration-300 hover:bg-blue-700"
-            >
-              Analyze Another Meal
-            </button>
-          </div>
+          <Button onClick={resetForm} className="w-full">
+            Analyze another Meal
+          </Button>
         )}
       </div>
     </main>
