@@ -10,6 +10,7 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hasCamera, setHasCamera] = useState(true);
+  const [isFrontCamera, setIsFrontCamera] = useState(false);
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -21,25 +22,23 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
             facingMode: { exact: "environment" },
           },
         });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
+        setIsFrontCamera(false);
       } catch (error) {
-        console.error("Error accessing camera:", error);
-        // If "environment" fails, try without the "exact" constraint
+        console.error("Error accessing rear camera:", error);
         try {
           stream = await navigator.mediaDevices.getUserMedia({
-            video: {
-              facingMode: "environment",
-            },
+            video: { facingMode: "user" },
           });
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
+          setIsFrontCamera(true);
         } catch (fallbackError) {
           console.error("Error accessing any camera:", fallbackError);
           setHasCamera(false);
+          return;
         }
+      }
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
       }
     }
 
@@ -61,8 +60,22 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext("2d");
     if (ctx) {
-      // Draw the image directly without flipping
-      ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+      if (isFrontCamera) {
+        // Flip the image horizontally for front camera
+        ctx.scale(-1, 1);
+        ctx.drawImage(
+          video,
+          -video.videoWidth,
+          0,
+          video.videoWidth,
+          video.videoHeight,
+        );
+        // Reset the transformation
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+      } else {
+        // Draw the image directly for rear camera
+        ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+      }
     }
 
     const imageUrl = canvas.toDataURL("image/jpeg");
@@ -81,7 +94,7 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
             ref={videoRef}
             autoPlay
             playsInline
-            className="relative h-full w-full object-cover"
+            className={`relative h-full w-full object-cover ${isFrontCamera ? "scale-x-[-1]" : ""}`}
           />
         ) : (
           <div className="relative flex h-full w-full flex-col items-center justify-center bg-gray-200 p-4 text-center">
