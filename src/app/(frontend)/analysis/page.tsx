@@ -5,7 +5,6 @@ import Image from "next/image";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 
-// Camera component
 const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -85,7 +84,6 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
   return (
     <div className="flex flex-col items-center gap-4 md:gap-6">
       <div className="relative aspect-square w-full overflow-hidden">
-        {/* Loading message */}
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-600">
           Loading camera...
         </div>
@@ -118,7 +116,6 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
   );
 };
 
-// Main component
 export default function MealAnalysisPage() {
   const [step, setStep] = useState<"camera" | "details" | "analysis">("camera");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -171,7 +168,7 @@ export default function MealAnalysisPage() {
       const analyzeResult = (await analyzeResponse.json()) as {
         analysis: string;
       };
-      setAnalysis(analyzeResult.analysis);
+      setAnalysis(analyzeResult.analysis.replaceAll(", ", "\n"));
       setStep("analysis");
     } catch (error) {
       console.error("Error processing meal:", error);
