@@ -10,9 +10,11 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
   const [hasCamera, setHasCamera] = useState(true);
 
   useEffect(() => {
+    let stream: MediaStream | null = null;
+
     async function setupCamera() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
+        stream = await navigator.mediaDevices.getUserMedia({
           video: true,
         });
         if (videoRef.current) {
@@ -27,8 +29,7 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
     void setupCamera();
 
     return () => {
-      if (videoRef.current?.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
+      if (stream) {
         stream.getTracks().forEach((track) => track.stop());
       }
     };
