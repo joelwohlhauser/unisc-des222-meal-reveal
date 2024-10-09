@@ -17,14 +17,29 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
     async function setupCamera() {
       try {
         stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
+          video: {
+            facingMode: { exact: "environment" },
+          },
         });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
       } catch (error) {
         console.error("Error accessing camera:", error);
-        setHasCamera(false);
+        // If "environment" fails, try without the "exact" constraint
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: "environment",
+            },
+          });
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        } catch (fallbackError) {
+          console.error("Error accessing any camera:", fallbackError);
+          setHasCamera(false);
+        }
       }
     }
 
