@@ -7,7 +7,14 @@ await import("./src/env.js");
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["sgtfht5vfdrvx9qx.public.blob.vercel-storage.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "sgtfht5vfdrvx9qx.public.blob.vercel-storage.com",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
 };
 

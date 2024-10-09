@@ -26,7 +26,7 @@ export default function HomePage() {
           <p>Fat: 15g</p>
           <p>Protein: 20g</p>
         </div>
-        <Link href="/take-picture" className="w-full">
+        <Link href="/analysis" className="w-full">
           <button className="w-full rounded-lg bg-blue-500 px-6 py-3 font-bold text-white transition duration-300 hover:bg-blue-600">
             Let&apos;s get started
           </button>
