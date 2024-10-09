@@ -63,7 +63,7 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="relative aspect-square w-full overflow-hidden rounded-lg">
+      <div className="relative aspect-square w-full overflow-hidden rounded-lg shadow-md">
         {hasCamera ? (
           <video
             ref={videoRef}
@@ -72,9 +72,9 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
             className="h-full w-full scale-x-[-1] transform object-cover"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gray-300">
+          <div className="flex h-full w-full items-center justify-center bg-gray-200">
             <svg
-              className="h-24 w-24 text-gray-500"
+              className="h-24 w-24 text-gray-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -99,7 +99,7 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
       <canvas ref={canvasRef} style={{ display: "none" }} />
       <button
         onClick={captureImage}
-        className="w-full rounded-lg bg-blue-500 px-6 py-3 font-bold text-white transition duration-300 hover:bg-blue-600"
+        className="w-full rounded-lg bg-blue-600 px-6 py-3 font-bold text-white transition duration-300 hover:bg-blue-700 disabled:bg-blue-300"
         disabled={!hasCamera}
       >
         Take Picture
@@ -185,9 +185,9 @@ export default function MealAnalysisPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] p-4 text-white">
-      <div className="container mx-auto flex max-w-md flex-col items-center justify-center gap-8">
-        <h1 className="text-center text-3xl font-bold sm:text-4xl">
+    <main className="min-h-screen bg-white text-gray-800">
+      <div className="container mx-auto max-w-lg px-4 py-16">
+        <h1 className="mb-8 text-center text-3xl font-bold text-gray-900 sm:text-4xl">
           {step === "camera" && "Take a Picture"}
           {step === "details" && "Meal Details"}
           {step === "analysis" && "Meal Analysis"}
@@ -196,8 +196,8 @@ export default function MealAnalysisPage() {
         {step === "camera" && <Camera onCapture={handleCapture} />}
 
         {(step === "details" || step === "analysis") && imageUrl && (
-          <div className="flex w-full flex-col gap-4">
-            <div className="relative aspect-square w-full overflow-hidden rounded-lg">
+          <div className="mb-8 flex w-full flex-col gap-4">
+            <div className="relative aspect-square w-full overflow-hidden rounded-lg shadow-md">
               <Image
                 src={imageUrl}
                 alt="Captured meal"
@@ -209,7 +209,7 @@ export default function MealAnalysisPage() {
               <button
                 type="button"
                 onClick={handleRetake}
-                className="flex-1 rounded-lg bg-gray-500 px-6 py-3 font-bold text-white transition duration-300 hover:bg-gray-600"
+                className="rounded-lg bg-gray-200 px-6 py-3 font-bold text-gray-800 transition duration-300 hover:bg-gray-300"
               >
                 Retake Picture
               </button>
@@ -218,11 +218,11 @@ export default function MealAnalysisPage() {
         )}
 
         {step === "details" && (
-          <form onSubmit={handleSubmit} className="w-full space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
                 htmlFor="mealDescription"
-                className="block text-sm font-medium"
+                className="block text-sm font-medium text-gray-700"
               >
                 Meal Description (Optional)
               </label>
@@ -230,14 +230,14 @@ export default function MealAnalysisPage() {
                 id="mealDescription"
                 value={mealDescription}
                 onChange={(e) => setMealDescription(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 text-black shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                 rows={3}
               ></textarea>
             </div>
-            <div className="flex">
+            <div>
               <button
                 type="submit"
-                className="flex-1 rounded-lg bg-blue-500 px-6 py-3 font-bold text-white transition duration-300 hover:bg-blue-600 disabled:bg-blue-300"
+                className="w-full rounded-lg bg-blue-600 px-6 py-3 font-bold text-white transition duration-300 hover:bg-blue-700 disabled:bg-blue-300"
                 disabled={isLoading}
               >
                 {isLoading ? "Analyzing..." : "Analyze Meal"}
@@ -247,12 +247,14 @@ export default function MealAnalysisPage() {
         )}
 
         {step === "analysis" && analysis && (
-          <div className="w-full space-y-4">
-            <h2 className="text-xl font-semibold">Analysis Result:</h2>
-            <p className="text-white">{analysis}</p>
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Analysis Result:
+            </h2>
+            <p className="text-gray-700">{analysis}</p>
             <button
               onClick={resetForm}
-              className="w-full rounded-lg bg-blue-500 px-6 py-3 font-bold text-white transition duration-300 hover:bg-blue-600"
+              className="w-full rounded-lg bg-blue-600 px-6 py-3 font-bold text-white transition duration-300 hover:bg-blue-700"
             >
               Analyze Another Meal
             </button>

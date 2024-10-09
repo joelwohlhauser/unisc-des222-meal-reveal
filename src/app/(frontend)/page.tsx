@@ -3,31 +3,32 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] p-4 text-white">
-      <div className="container mx-auto flex max-w-md flex-col items-center justify-center gap-8">
-        <h1 className="text-center text-4xl font-extrabold tracking-tight sm:text-5xl">
+    <main className="min-h-screen bg-white text-gray-800">
+      <div className="container mx-auto max-w-lg px-4 py-16">
+        <h1 className="mb-8 text-center text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
           Welcome to MealReveal
         </h1>
-        <p className="text-center text-xl">
+        <p className="mb-12 text-center text-xl text-gray-600">
           Stop calorie counting. Just snap a picture of your meal!
         </p>
-        <div className="relative aspect-square w-full">
+        <div className="mb-8 overflow-hidden rounded-2xl shadow-lg">
           <Image
             src="/example-meals/pasta.webp"
             alt="Example meal"
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            style={{ objectFit: "cover" }}
-            className="rounded-lg"
+            width={800}
+            height={600}
+            layout="responsive"
+            objectFit="cover"
           />
         </div>
-        <div className="w-full rounded-lg bg-white p-4 text-black">
+        <div className="mb-8 rounded-lg bg-gray-100 p-6 shadow-md">
+          <h2 className="mb-4 text-2xl font-semibold">Sample Analysis</h2>
           <p>Calories: 520</p>
           <p>Fat: 15g</p>
           <p>Protein: 20g</p>
         </div>
-        <Link href="/analysis" className="w-full">
-          <button className="w-full rounded-lg bg-blue-500 px-6 py-3 font-bold text-white transition duration-300 hover:bg-blue-600">
+        <Link href="/analysis" className="block w-full">
+          <button className="w-full rounded-lg bg-blue-600 px-6 py-3 font-bold text-white transition duration-300 hover:bg-blue-700">
             Let&apos;s get started
           </button>
         </Link>
