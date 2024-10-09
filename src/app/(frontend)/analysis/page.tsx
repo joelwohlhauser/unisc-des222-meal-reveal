@@ -120,7 +120,7 @@ export default function MealAnalysisPage() {
   const [step, setStep] = useState<"camera" | "details" | "analysis">("camera");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [mealDescription, setMealDescription] = useState("");
-  const [analysis, setAnalysis] = useState<string | null>(null);
+  const [analysis, setAnalysis] = useState<string[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCapture = (capturedImageUrl: string) => {
@@ -168,7 +168,7 @@ export default function MealAnalysisPage() {
       const analyzeResult = (await analyzeResponse.json()) as {
         analysis: string;
       };
-      setAnalysis(analyzeResult.analysis.replaceAll(", ", "\n"));
+      setAnalysis(analyzeResult.analysis.split(", "));
       setStep("analysis");
     } catch (error) {
       console.error("Error processing meal:", error);
@@ -268,7 +268,11 @@ export default function MealAnalysisPage() {
                     <h2 className="text-2xl font-semibold text-gray-900">
                       Nutrition Facts
                     </h2>
-                    <p className="text-gray-700">{analysis}</p>
+                    <div className="text-gray-700">
+                      {analysis.map((item, index) => (
+                        <p key={index}>{item}</p>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
