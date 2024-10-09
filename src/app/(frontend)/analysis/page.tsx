@@ -61,17 +61,8 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext("2d");
     if (ctx) {
-      // Flip the image horizontally
-      ctx.scale(-1, 1);
-      ctx.drawImage(
-        video,
-        -video.videoWidth,
-        0,
-        video.videoWidth,
-        video.videoHeight,
-      );
-      // Reset the transformation
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      // Draw the image directly without flipping
+      ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
     }
 
     const imageUrl = canvas.toDataURL("image/jpeg");
@@ -90,7 +81,7 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
             ref={videoRef}
             autoPlay
             playsInline
-            className="relative h-full w-full scale-x-[-1] transform object-cover"
+            className="relative h-full w-full object-cover"
           />
         ) : (
           <div className="relative flex h-full w-full flex-col items-center justify-center bg-gray-200 p-4 text-center">
