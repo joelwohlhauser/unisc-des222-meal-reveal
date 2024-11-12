@@ -47,18 +47,6 @@
       "src": "/apple-touch-icon/180x180.png",
       "sizes": "180x180",
       "type": "image/png"
-    },
-    {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
     }
   ],
   "shortcuts": [
@@ -67,24 +55,14 @@
       "short_name": "Analyze",
       "description": "Take a picture of your meal",
       "url": "/analyse",
-      "icons": [
-        {
-          "src": "/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": []
     },
     {
       "name": "View History",
       "short_name": "History",
       "description": "View your meal history",
       "url": "/history",
-      "icons": [
-        {
-          "src": "/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": []
     }
   ]
 }
