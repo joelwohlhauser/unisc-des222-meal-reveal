@@ -4,6 +4,10 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
+import { useAtom } from "jotai";
+import { mealHistoryAtom } from "~/lib/atoms";
+import type { AnalyzedMeal } from "~/lib/atoms";
+import { STORAGE_URL } from "~/lib/config";
 
 const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -122,6 +126,7 @@ export default function MealAnalysisPage() {
   const [mealDescription, setMealDescription] = useState("");
   const [analysis, setAnalysis] = useState<string[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [, setMealHistory] = useAtom(mealHistoryAtom);
 
   const handleCapture = (capturedImageUrl: string) => {
     setImageUrl(capturedImageUrl);
@@ -133,9 +138,11 @@ export default function MealAnalysisPage() {
     setIsLoading(true);
 
     try {
+      const filename = `meal-image.jpg`;
+
       // First, upload the image
       const imageBlob = await fetch(imageUrl!).then((r) => r.blob());
-      const imageFile = new File([imageBlob], "meal-picture.jpg", {
+      const imageFile = new File([imageBlob], filename, {
         type: "image/jpeg",
       });
 
@@ -150,6 +157,11 @@ export default function MealAnalysisPage() {
       if (!uploadResponse.ok) throw new Error("Upload failed");
 
       const uploadResult = (await uploadResponse.json()) as { url: string };
+
+      // Extract the actual imageId from the URL (everything after the last slash)
+      const actualImageId = uploadResult.url
+        .replace(`${STORAGE_URL}/`, "")
+        .replace(".jpg", "");
 
       // Then, analyze the meal
       const analyzeResponse = await fetch("/api/meal/analyze", {
@@ -168,7 +180,18 @@ export default function MealAnalysisPage() {
       const analyzeResult = (await analyzeResponse.json()) as {
         analysis: string;
       };
-      setAnalysis(analyzeResult.analysis.split(", "));
+      const analysisArray = analyzeResult.analysis.split(", ");
+      setAnalysis(analysisArray);
+
+      // Store the meal in history with the actual imageId
+      const newMeal: AnalyzedMeal = {
+        imageId: actualImageId,
+        description: mealDescription,
+        analysis: analysisArray,
+        timestamp: Date.now(),
+      };
+
+      setMealHistory((prev) => [...prev, newMeal]);
       setStep("analysis");
     } catch (error) {
       console.error("Error processing meal:", error);
@@ -192,7 +215,7 @@ export default function MealAnalysisPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-gray-800">
+    <main className="min-h-screen bg-white pb-20 text-gray-800">
       <div className="container mx-auto max-w-lg space-y-8 px-4 pb-16 pt-8 md:pt-16">
         <h1 className="text-center text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
           {step === "camera" && "Take a Picture"}

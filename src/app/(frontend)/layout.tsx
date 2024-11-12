@@ -2,6 +2,7 @@ import "~/styles/globals.css";
 
 import { GeistSans } from "geist/font/sans";
 import { type Viewport, type Metadata } from "next";
+import { Navigation } from "~/components/navigation";
 
 export const viewport: Viewport = {
   initialScale: 1,
@@ -21,7 +22,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Navigation />
+      </body>
     </html>
   );
 }

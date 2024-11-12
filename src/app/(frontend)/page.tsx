@@ -26,7 +26,7 @@ export default function HomePage() {
   const currentMeal = exampleMeals[currentMealIndex];
 
   return (
-    <main className="min-h-screen bg-white text-gray-800">
+    <main className="min-h-screen bg-white pb-20 text-gray-800">
       <div className="container mx-auto max-w-lg space-y-8 px-4 pb-16 pt-8 md:pt-16">
         <div className="space-y-6">
           <h1 className="text-center text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
@@ -56,7 +56,7 @@ export default function HomePage() {
             <p>Protein: {currentMeal?.protein}g</p>
           </div>
         </div>
-        <Link href="/analysis" className="block w-full">
+        <Link href="/analyse" className="block w-full">
           <Button className="w-full">Let&apos;s get started</Button>
         </Link>
       </div>
