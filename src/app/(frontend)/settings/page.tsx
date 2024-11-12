@@ -31,6 +31,21 @@ export default function SettingsPage() {
 
         <div className="space-y-6">
           <div className="rounded-lg border border-gray-200 p-4 shadow-sm">
+            <h2 className="mb-4 text-xl font-semibold">Install App</h2>
+            <div className="space-y-4 text-gray-600">
+              <p>Install MealReveal on your device for the best experience:</p>
+              <div className="space-y-2">
+                <p className="font-medium">On iOS Safari:</p>
+                <ol className="ml-4 list-decimal space-y-1">
+                  <li>Tap the Share button</li>
+                  <li>Scroll down and tap &quot;Add to Home Screen&quot;</li>
+                  <li>Tap &quot;Add&quot; to confirm</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-gray-200 p-4 shadow-sm">
             <h2 className="mb-4 text-xl font-semibold">Data Management</h2>
             <AlertDialog>
               <AlertDialogTrigger asChild>
