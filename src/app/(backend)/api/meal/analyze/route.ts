@@ -6,6 +6,13 @@ const openai = new OpenAI({
   apiKey: env.OPENAI_API_KEY,
 });
 
+interface NutritionResponse {
+  calories?: number;
+  fat?: number;
+  protein?: number;
+  error?: string;
+}
+
 export async function POST(request: Request) {
   const { imageUrl, mealDescription } = await request.json() as {
     imageUrl: string;
@@ -24,17 +31,17 @@ export async function POST(request: Request) {
               text: `You are the AI for the 'MealReveal' app, designed to provide nutritional information for meals based on images uploaded by users. Your task involves two primary functions:
 
 1. Meal Identification:
-   When a user uploads an image of a meal, first determine if the meal or any food item can be recognized. If you cannot identify any meal or food item in the image, respond with:
-   <error>I'm sorry, but I didn't recognize any meal or food in the provided image.</error>
+   When a user uploads an image of a meal, first determine if the meal or any food item can be recognized. If you cannot identify any meal or food item in the image, return a JSON response in this format:
+   {"error": "I'm sorry, but I didn't recognize any meal or food in the provided image."}
 
 2. User-Provided Information:
    <description>${mealDescription}</description>
 
 3. Nutritional Information Reporting:
-   If you do recognize the meal or food item in the image, provide its nutritional information. Use the user-provided description to tailor the results. Return the nutritional details in the following precise format:
-   <nutrition>Calories: XXX, Fat: XXg, Protein: XXg</nutrition>
+   If you do recognize the meal or food item in the image, provide its nutritional information in the following JSON format:
+   {"calories": 500, "fat": 20, "protein": 30}
 
-Do NOT add more information or return more text. Do not include the user-provided information in your response.`,
+Return ONLY the JSON response, no additional text.`,
             },
             {
               type: "image_url",
@@ -48,15 +55,31 @@ Do NOT add more information or return more text. Do not include the user-provide
       max_tokens: 300,
     });
 
-    let analysis = response.choices[0]?.message?.content;
+    const content = response.choices[0]?.message?.content;
+    let nutritionData: NutritionResponse = {};
 
-    // Remove <nutrition> tags if they exist
-    if (analysis) {
-      analysis = analysis.replace(/<nutrition>|<\/nutrition>/g, '');
-      analysis = analysis.replace(/<error>|<\/error>/g, '');
+    if (content) {
+      try {
+        const parsedData = JSON.parse(content) as unknown;
+        if (
+          parsedData &&
+          typeof parsedData === 'object' &&
+          (
+            ('calories' in parsedData && typeof parsedData.calories === 'number') ||
+            ('error' in parsedData && typeof parsedData.error === 'string')
+          )
+        ) {
+          nutritionData = parsedData as NutritionResponse;
+        } else {
+          nutritionData = { error: "Invalid response format" };
+        }
+      } catch (e) {
+        console.error("Failed to parse JSON response:", e);
+        nutritionData = { error: "Failed to parse nutrition data" };
+      }
     }
 
-    return NextResponse.json({ analysis });
+    return NextResponse.json(nutritionData);
   } catch (error) {
     console.error("Error analyzing meal:", error);
     return NextResponse.json({ error: "Failed to analyze meal" }, { status: 500 });

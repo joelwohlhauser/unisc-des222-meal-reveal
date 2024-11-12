@@ -24,7 +24,7 @@ export default function SettingsPage() {
 
   return (
     <main className="min-h-screen bg-white text-gray-800">
-      <div className="container mx-auto max-w-lg space-y-8 px-4 pb-16 pt-8 md:pt-16">
+      <div className="container mx-auto max-w-lg space-y-8 px-4 pb-40 pt-8 md:pt-16">
         <h1 className="text-center text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
           Settings
         </h1>

@@ -6,7 +6,7 @@ import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 import { useAtom } from "jotai";
 import { mealHistoryAtom } from "~/lib/atoms";
-import type { AnalyzedMeal } from "~/lib/atoms";
+import type { AnalyzedMeal, NutritionResponse } from "~/lib/atoms";
 import { STORAGE_URL } from "~/lib/config";
 
 const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
@@ -156,6 +156,7 @@ export default function MealAnalysisPage() {
   const [analysis, setAnalysis] = useState<string[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [, setMealHistory] = useAtom(mealHistoryAtom);
+  const [nutritionData, setNutritionData] = useState<NutritionResponse>({});
 
   const handleCapture = (capturedImageUrl: string) => {
     setImageUrl(capturedImageUrl);
@@ -206,18 +207,24 @@ export default function MealAnalysisPage() {
 
       if (!analyzeResponse.ok) throw new Error("Analysis failed");
 
-      const analyzeResult = (await analyzeResponse.json()) as {
-        analysis: string;
-      };
-      const analysisArray = analyzeResult.analysis.split(", ");
-      setAnalysis(analysisArray);
+      const responseData = (await analyzeResponse.json()) as NutritionResponse;
 
-      // Store the meal in history with the actual imageId
+      // Validate and set the nutrition data
+      const validatedNutritionData: NutritionResponse = {
+        calories: responseData.calories ?? undefined,
+        fat: responseData.fat ?? undefined,
+        protein: responseData.protein ?? undefined,
+        error: responseData.error ?? undefined,
+      };
+
+      setNutritionData(validatedNutritionData);
+
+      // Store the meal in history
       const newMeal: AnalyzedMeal = {
         imageId: actualImageId,
         description: mealDescription,
-        analysis: analysisArray,
         timestamp: Date.now(),
+        nutritionData: validatedNutritionData,
       };
 
       setMealHistory((prev) => [...prev, newMeal]);
@@ -234,6 +241,7 @@ export default function MealAnalysisPage() {
     setImageUrl(null);
     setMealDescription("");
     setAnalysis(null);
+    setNutritionData({});
     setStep("camera");
   };
 
@@ -245,7 +253,7 @@ export default function MealAnalysisPage() {
 
   return (
     <main className="min-h-screen bg-white pb-20 text-gray-800">
-      <div className="container mx-auto max-w-lg space-y-8 px-4 pb-16 pt-8 md:pt-16">
+      <div className="container mx-auto max-w-lg space-y-8 px-4 pb-40 pt-8 md:pt-16">
         <h1 className="text-center text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
           {step === "camera" && "Take a Picture"}
           {step === "details" && "Meal Details"}
@@ -314,16 +322,28 @@ export default function MealAnalysisPage() {
                 </>
               )}
 
-              {step === "analysis" && analysis && (
+              {step === "analysis" && (
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <h2 className="text-2xl font-semibold text-gray-900">
                       Nutrition Facts
                     </h2>
                     <div className="text-gray-700">
-                      {analysis.map((item, index) => (
-                        <p key={index}>{item}</p>
-                      ))}
+                      {nutritionData.error ? (
+                        <p className="text-red-500">{nutritionData.error}</p>
+                      ) : (
+                        <>
+                          {nutritionData.calories && (
+                            <p>Calories: {nutritionData.calories}</p>
+                          )}
+                          {nutritionData.fat && (
+                            <p>Fat: {nutritionData.fat}g</p>
+                          )}
+                          {nutritionData.protein && (
+                            <p>Protein: {nutritionData.protein}g</p>
+                          )}
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -332,7 +352,7 @@ export default function MealAnalysisPage() {
           )}
         </div>
 
-        {step === "analysis" && analysis && (
+        {step === "analysis" && (
           <Button onClick={resetForm} className="w-full">
             Analyze another Meal
           </Button>
