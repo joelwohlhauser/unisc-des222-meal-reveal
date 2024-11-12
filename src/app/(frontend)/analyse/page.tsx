@@ -85,6 +85,19 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
     onCapture(imageUrl);
   };
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === "string") {
+        onCapture(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="flex flex-col items-center gap-4 md:gap-6">
       <div className="relative aspect-square w-full overflow-hidden">
@@ -111,10 +124,26 @@ const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
         )}
       </div>
       <canvas ref={canvasRef} style={{ display: "none" }} />
-      <div className="mb-4 w-full px-4 md:mb-6 md:px-6">
+      <div className="mb-4 w-full space-y-2 px-4 md:mb-6 md:px-6">
         <Button onClick={captureImage} className="w-full" disabled={!hasCamera}>
           Take Picture
         </Button>
+        <div className="relative w-full">
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => document.getElementById("fileInput")?.click()}
+          >
+            Select from Library
+          </Button>
+          <input
+            type="file"
+            id="fileInput"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileUpload}
+          />
+        </div>
       </div>
     </div>
   );

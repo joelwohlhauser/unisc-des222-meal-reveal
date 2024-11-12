@@ -4,6 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Button } from "~/components/ui/button";
+import { useAtom } from "jotai";
+import { mealHistoryAtom } from "~/lib/atoms";
+import { useRouter } from "next/navigation";
 
 const exampleMeals = [
   { name: "pasta", calories: 655, fat: 31, protein: 32 },
@@ -14,6 +17,15 @@ const exampleMeals = [
 
 export default function HomePage() {
   const [currentMealIndex, setCurrentMealIndex] = useState(0);
+  const [mealHistory] = useAtom(mealHistoryAtom);
+  const router = useRouter();
+
+  useEffect(() => {
+    // If user has already analyzed meals, redirect to analyse page
+    if (mealHistory.length > 0) {
+      router.push("/analyse");
+    }
+  }, [mealHistory, router]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -24,6 +36,11 @@ export default function HomePage() {
   }, []);
 
   const currentMeal = exampleMeals[currentMealIndex];
+
+  // If there's meal history, don't render the homepage content
+  if (mealHistory.length > 0) {
+    return null; // Return null to avoid flash of content during redirect
+  }
 
   return (
     <main className="min-h-screen bg-white pb-20 text-gray-800">
