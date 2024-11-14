@@ -45,7 +45,6 @@ ${mealDescription}
 \n
 [ Then provide a bullet-point list where each line follows this format:
 * [ingredient name] ([portion size]): [calories]cal, [fat]g fat, [protein]g protein ]\n
-
 \n\n[ End on a new line with one sentence evaluating if this meal is healthy or not and why. ]
 </BreakdownTemplate>
 
