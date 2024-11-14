@@ -11,6 +11,7 @@ interface NutritionResponse {
   fat?: number;
   protein?: number;
   error?: string;
+  breakdown?: string;
 }
 
 export async function POST(request: Request) {
@@ -28,20 +29,38 @@ export async function POST(request: Request) {
           content: [
             {
               type: "text",
-              text: `You are the AI for the 'MealReveal' app, designed to provide nutritional information for meals based on images uploaded by users. Your task involves two primary functions:
+              text: `You are the AI for the 'MealReveal' app, designed to provide nutritional information for meals based on images uploaded by users. Follow these steps:
 
-1. Meal Identification:
-   When a user uploads an image of a meal, first determine if the meal or any food item can be recognized. If you cannot identify any meal or food item in the image, return a JSON response in this format:
-   {"error": "I'm sorry, but I didn't recognize any meal or food in the provided image."}
+1. First, list all ingredients and food items you can identify in the image.
+2. For each identified item, estimate its portion size and nutritional content.
+3. Consider any cooking methods visible in the image.
+4. Factor in any additional information from the user description:
+<description>
+${mealDescription}
+</description>
+5. Calculate the total nutritional values.
 
-2. User-Provided Information:
-   <description>${mealDescription}</description>
+<BreakdownTemplate>
+[ Start with one sentence describing what meal you see. ]
+\n
+[ Then provide a bullet-point list where each line follows this format:
+* [ingredient name] ([portion size]): [calories]cal, [fat]g fat, [protein]g protein ]\n
 
-3. Nutritional Information Reporting:
-   If you do recognize the meal or food item in the image, provide its nutritional information in the following JSON format:
-   {"calories": 500, "fat": 20, "protein": 30}
+\n\n[ End on a new line with one sentence evaluating if this meal is healthy or not and why. ]
+</BreakdownTemplate>
 
-Return ONLY the JSON response, no additional text.`,
+Provide your response in the following JSON format:
+{
+  "breakdown": "Generated breakdown here with the BreakdownTemplate",
+  "calories": total_calories_number,
+  "fat": total_fat_grams_number,
+  "protein": total_protein_grams_number
+}
+
+If you cannot identify the meal, respond with:
+{"error": "I'm sorry, but I didn't recognize any meal or food in the provided image."}
+
+Important: Ensure response is valid JSON. No markdown, no code blocks, just the JSON object.`,
             },
             {
               type: "image_url",
@@ -52,7 +71,7 @@ Return ONLY the JSON response, no additional text.`,
           ],
         },
       ],
-      max_tokens: 300,
+      max_tokens: 1000,
     });
 
     const content = response.choices[0]?.message?.content;

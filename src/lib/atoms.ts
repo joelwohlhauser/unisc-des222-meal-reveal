@@ -5,6 +5,7 @@ export interface NutritionResponse {
   fat?: number;
   protein?: number;
   error?: string;
+  breakdown?: string;
 }
 
 export interface AnalyzedMeal {

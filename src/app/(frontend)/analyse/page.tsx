@@ -8,6 +8,13 @@ import { useAtom } from "jotai";
 import { mealHistoryAtom } from "~/lib/atoms";
 import type { AnalyzedMeal, NutritionResponse } from "~/lib/atoms";
 import { STORAGE_URL } from "~/lib/config";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "~/components/ui/accordion";
+import MarkdownContent from "~/components/MarkdownContent";
 
 const Camera = ({ onCapture }: { onCapture: (imageUrl: string) => void }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -153,7 +160,6 @@ export default function MealAnalysisPage() {
   const [step, setStep] = useState<"camera" | "details" | "analysis">("camera");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [mealDescription, setMealDescription] = useState("");
-  const [analysis, setAnalysis] = useState<string[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [, setMealHistory] = useAtom(mealHistoryAtom);
   const [nutritionData, setNutritionData] = useState<NutritionResponse>({});
@@ -215,6 +221,7 @@ export default function MealAnalysisPage() {
         fat: responseData.fat ?? undefined,
         protein: responseData.protein ?? undefined,
         error: responseData.error ?? undefined,
+        breakdown: responseData.breakdown ?? undefined,
       };
 
       setNutritionData(validatedNutritionData);
@@ -240,7 +247,6 @@ export default function MealAnalysisPage() {
   const resetForm = () => {
     setImageUrl(null);
     setMealDescription("");
-    setAnalysis(null);
     setNutritionData({});
     setStep("camera");
   };
@@ -332,17 +338,34 @@ export default function MealAnalysisPage() {
                       {nutritionData.error ? (
                         <p className="text-red-500">{nutritionData.error}</p>
                       ) : (
-                        <>
-                          {nutritionData.calories && (
-                            <p>Calories: {nutritionData.calories}</p>
+                        <div className="space-y-4">
+                          <div>
+                            {nutritionData.calories && (
+                              <p>Calories: {nutritionData.calories}</p>
+                            )}
+                            {nutritionData.fat && (
+                              <p>Fat: {nutritionData.fat}g</p>
+                            )}
+                            {nutritionData.protein && (
+                              <p>Protein: {nutritionData.protein}g</p>
+                            )}
+                          </div>
+                          {nutritionData.breakdown && (
+                            <Accordion type="single" collapsible>
+                              <AccordionItem value="breakdown">
+                                <AccordionTrigger>
+                                  Analysis Breakdown
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                  <MarkdownContent
+                                    className="text-sm"
+                                    content={nutritionData.breakdown}
+                                  />
+                                </AccordionContent>
+                              </AccordionItem>
+                            </Accordion>
                           )}
-                          {nutritionData.fat && (
-                            <p>Fat: {nutritionData.fat}g</p>
-                          )}
-                          {nutritionData.protein && (
-                            <p>Protein: {nutritionData.protein}g</p>
-                          )}
-                        </>
+                        </div>
                       )}
                     </div>
                   </div>

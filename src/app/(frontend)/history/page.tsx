@@ -12,6 +12,13 @@ import {
 } from "date-fns";
 import { STORAGE_URL } from "~/lib/config";
 import type { AnalyzedMeal } from "~/lib/atoms";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "~/components/ui/accordion";
+import MarkdownContent from "~/components/MarkdownContent";
 
 type GroupedMeals = Record<string, AnalyzedMeal[]>;
 
@@ -66,35 +73,53 @@ export default function HistoryPage() {
           src={`${STORAGE_URL}/${meal.imageId}.jpg`}
           alt="Meal"
           fill
+          sizes="(max-width: 768px) 100vw, 768px"
           className="object-cover"
         />
       </div>
       <div className="p-4">
-        <div className="mb-2 text-sm text-gray-500">
+        <div className="mb-4 text-sm text-gray-500">
           {format(meal.timestamp, "h:mm a")}
         </div>
         {meal.description && (
-          <p className="mb-3 text-gray-700">{meal.description}</p>
+          <p className="mb-4 text-gray-700">{meal.description}</p>
         )}
         <div className="space-y-1">
           {meal.nutritionData.error ? (
             <p className="text-red-500">{meal.nutritionData.error}</p>
           ) : (
-            <>
-              {meal.nutritionData.calories && (
-                <p className="text-gray-900">
-                  Calories: {meal.nutritionData.calories}
-                </p>
+            <div className="space-y-4">
+              <div>
+                {meal.nutritionData.calories && (
+                  <p className="text-gray-900">
+                    Calories: {meal.nutritionData.calories}
+                  </p>
+                )}
+                {meal.nutritionData.fat && (
+                  <p className="text-gray-900">
+                    Fat: {meal.nutritionData.fat}g
+                  </p>
+                )}
+                {meal.nutritionData.protein && (
+                  <p className="text-gray-900">
+                    Protein: {meal.nutritionData.protein}g
+                  </p>
+                )}
+              </div>
+              {meal.nutritionData.breakdown && (
+                <Accordion type="single" collapsible>
+                  <AccordionItem value="breakdown">
+                    <AccordionTrigger>Analysis Breakdown</AccordionTrigger>
+                    <AccordionContent>
+                      <MarkdownContent
+                        className="text-sm"
+                        content={meal.nutritionData.breakdown}
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               )}
-              {meal.nutritionData.fat && (
-                <p className="text-gray-900">Fat: {meal.nutritionData.fat}g</p>
-              )}
-              {meal.nutritionData.protein && (
-                <p className="text-gray-900">
-                  Protein: {meal.nutritionData.protein}g
-                </p>
-              )}
-            </>
+            </div>
           )}
         </div>
       </div>

@@ -3,12 +3,13 @@ import "~/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { type Viewport, type Metadata } from "next";
 import { Navigation } from "~/components/navigation";
+import { Provider } from "jotai";
 
 const APPLE_ICON_SIZES = [57, 72, 76, 114, 120, 144, 152, 180] as const;
 
 export const viewport: Viewport = {
-  initialScale: 1,
   width: "device-width",
+  initialScale: 1,
   maximumScale: 1,
   viewportFit: "cover",
   themeColor: "#ffffff",
@@ -37,8 +38,6 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
-  viewport:
-    "width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover",
 };
 
 export default function RootLayout({
@@ -47,12 +46,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <head>
-        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body>
-        {children}
-        <Navigation />
+        <Provider>
+          {children}
+          <Navigation />
+        </Provider>
       </body>
     </html>
   );
