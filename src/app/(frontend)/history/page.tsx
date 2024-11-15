@@ -19,11 +19,24 @@ import {
   AccordionTrigger,
 } from "~/components/ui/accordion";
 import MarkdownContent from "~/components/MarkdownContent";
+import { Button } from "~/components/ui/button";
+import { Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
 
 type GroupedMeals = Record<string, AnalyzedMeal[]>;
 
 export default function HistoryPage() {
-  const [mealHistory] = useAtom(mealHistoryAtom);
+  const [mealHistory, setMealHistory] = useAtom(mealHistoryAtom);
 
   // Calculate today's stats
   const todayStats = mealHistory.reduce(
@@ -63,6 +76,10 @@ export default function HistoryPage() {
       return groups;
     }, {});
 
+  const handleDeleteMeal = (imageId: string) => {
+    setMealHistory(mealHistory.filter((meal) => meal.imageId !== imageId));
+  };
+
   const renderMeal = (meal: AnalyzedMeal) => (
     <div
       key={meal.imageId}
@@ -78,8 +95,37 @@ export default function HistoryPage() {
         />
       </div>
       <div className="p-4">
-        <div className="mb-4 text-sm text-gray-500">
-          {format(meal.timestamp, "h:mm a")}
+        <div className="mb-4 flex items-center justify-between text-sm text-gray-500">
+          <span>{format(meal.timestamp, "h:mm a")}</span>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-gray-500 hover:text-red-500"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete this meal?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  this meal from your history.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => handleDeleteMeal(meal.imageId)}
+                  className="bg-red-500 hover:bg-red-600"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
         {meal.description && (
           <p className="mb-4 text-gray-700">{meal.description}</p>
